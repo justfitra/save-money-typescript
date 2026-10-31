@@ -1,0 +1,232 @@
+/* Reusable pieces. Text is centered by default; lists keep left-aligned rows. */
+input, select, button {
+  font: inherit;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  max-width: 100%;
+}
+input, select { text-align: center; }
+input:focus, select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+button {
+  background: var(--primary);
+  color: var(--on-primary);
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.06); }
+button.btn-ghost {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 7px 11px;
+}
+.muted { color: var(--muted); font-size: 12px; }
+.positive { color: var(--positive); }
+.negative { color: var(--negative); }
+.empty { padding: 18px; color: var(--muted); }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.card h3 { margin: 0 0 12px; font-size: 15px; color: var(--primary-dark); }
+@media (prefers-color-scheme: dark) { .card h3 { color: var(--primary); } }
+.card label { display: block; margin: 10px 0 4px; }
+.card input, .card select { width: 100%; }
+.form-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; }
+.form-row input, .form-row select { flex: 1; min-width: 130px; }
+
+/* Hero (balance of the selected month) */
+.hero {
+  background: linear-gradient(135deg, #15803d, #22c55e);
+  color: #fff;
+  border-radius: 24px;
+  padding: 24px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.hero small { display: block; opacity: 0.9; font-size: 13px; }
+.hero h2 { margin: 6px 0; font-size: clamp(28px, 8vw, 40px); }
+.hero h2.negative { color: #ffe0e0; }
+.hero div { opacity: 0.95; font-size: 13px; }
+
+/* KPI cards */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.kpi-card { background: var(--card); border-radius: 16px; padding: 14px 10px; box-shadow: var(--shadow); }
+.kpi-label { font-size: 12px; color: var(--muted); }
+.kpi-value { font-size: 17px; font-weight: 700; margin-top: 4px; }
+
+/* Month pills */
+.month-pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.month-pills button {
+  padding: 7px 14px;
+  border-radius: 99px;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.month-pills button.active { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+
+/* Donut chart: chart on top, legend below */
+.donut { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.donut-svg { width: 170px; height: 170px; }
+.donut-center { font-size: 13px; font-weight: 700; fill: var(--text); }
+.donut-sub { font-size: 8px; fill: var(--muted); }
+.legend { width: 100%; max-width: 320px; font-size: 13px; text-align: left; }
+.legend > div { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.legend i { width: 11px; height: 11px; border-radius: 4px; flex: none; }
+.legend span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend em { width: 36px; text-align: right; font-style: normal; color: var(--muted); }
+
+/* Entry list (transactions, savings, debts) */
+.entry-list { text-align: left; }
+.entry { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.entry:last-child { border-bottom: 0; }
+.entry-icon {
+  width: 38px; height: 38px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+@media (prefers-color-scheme: dark) { .entry-icon { color: var(--primary); } }
+.entry-body { flex: 1; min-width: 0; }
+.entry-body b { display: block; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entry-body small { color: var(--muted); font-size: 12px; }
+.entry-amount { font-weight: 700; font-size: 14px; white-space: nowrap; }
+.entry-actions { display: flex; gap: 4px; }
+
+/* Budget cards */
+.budget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.budget-grid .card { margin: 0; cursor: pointer; }
+.budget-grid svg { width: 96px; height: 96px; }
+
+/* Analysis */
+.insights { list-style: none; padding: 0; margin: 0; }
+.insights li { margin: 10px 0; font-size: 14px; line-height: 1.5; }
+.recap-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.recap-table th { color: var(--muted); font-weight: 600; }
+.recap-table th, .recap-table td { padding: 7px 4px; text-align: center; border-bottom: 1px solid var(--border); }
+.table-scroll { overflow-x: auto; }
+
+/* Dialogs */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  padding: 14px;
+  background: #0009;
+}
+.modal-backdrop .card { width: 100%; max-width: 420px; margin: 0; }
+
+/* Budget cards — hover lift effect */
+.budget-card-item {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.budget-card-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px #14532d2e;
+}
+@media (prefers-color-scheme: dark) {
+  .budget-card-item:hover { box-shadow: 0 10px 28px #00000050; }
+}
+
+/* Budget page total summary bar */
+.budget-total-bar { margin: 10px 0 4px; }
+.budget-total-track {
+  height: 10px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.budget-total-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+.budget-total-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* BudgetModal */
+.budget-modal { max-width: 380px !important; }
+.budget-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.budget-modal-icon {
+  width: 48px; height: 48px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  font-size: 20px;
+}
+@media (prefers-color-scheme: dark) {
+  .budget-modal-icon { color: var(--primary); }
+}
+.budget-modal-title { font-size: 18px; display: block; }
+
+/* Live preview inside modal */
+.budget-preview { margin: 0 0 16px; }
+.budget-preview-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.budget-preview-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.budget-preview-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+.budget-preview-pct { font-weight: 700; font-size: 13px; }
+
+/* Budget input with Rp prefix */
+.budget-input-label { display: block; margin: 4px 0 6px; font-size: 13px; color: var(--muted); }
+.budget-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  overflow: hidden;
+  transition: outline 0.15s;
+}
+.budget-input-wrap:focus-within { outline: 2px solid var(--primary); outline-offset: 1px; }
+.budget-rp-prefix {
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  border-right: 1px solid var(--border);
+}
+.budget-input {
+  border: none !important;
+  outline: none !important;
+  flex: 1;
+  padding: 12px 14px;
+  text-align: left;
+  background: transparent;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}

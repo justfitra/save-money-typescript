@@ -1,0 +1,33 @@
+/* Color tokens. Green theme; dark mode follows the device setting. */
+:root {
+  --bg: #f0f8f2;
+  --card: #ffffff;
+  --text: #11271a;
+  --muted: #5d7867;
+  --border: #d8eadd;
+  --primary: #16a34a;
+  --primary-dark: #15803d;
+  --primary-soft: #dcfce7;
+  --on-primary: #ffffff;
+  --positive: #15803d;
+  --negative: #dc2626;
+  --warning: #d97706;
+  --shadow: 0 6px 20px #14532d1f;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a1810;
+    --card: #11261a;
+    --text: #e4f4ea;
+    --muted: #8db39a;
+    --border: #1f3d2b;
+    --primary: #22c55e;
+    --primary-dark: #16a34a;
+    --primary-soft: #14532d;
+    --on-primary: #052e16;
+    --positive: #4ade80;
+    --negative: #fb7185;
+    --warning: #fbbf24;
+    --shadow: 0 6px 20px #0008;
+  }
+}
