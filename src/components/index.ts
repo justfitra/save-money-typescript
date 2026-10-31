@@ -7,6 +7,7 @@ export { TransactionList } from "./transactions/TransactionList";
 export { EntryModal } from "./modals/EntryModal";
 export { NewMonthModal } from "./modals/NewMonthModal";
 export { BudgetModal } from "./modals/BudgetModal";
+export { SalaryModal } from "./modals/SalaryModal";
 export { ModalHost } from "./modals/ModalHost";
 export { Header } from "./layout/Header";
 export { SettingsPanel } from "./layout/SettingsPanel";

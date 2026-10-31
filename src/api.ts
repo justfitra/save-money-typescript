@@ -12,7 +12,7 @@ import type {
 export const DEFAULT_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1j4zjt8jFbzS9cfcKQiqj3hXB-vlzhQ0GEM7RIKXzNMo/edit";
 export const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxqSDwZEkb9CACzSLBjxOOZlFPos1cv6FGMY9TdKEqcu0FrpF7RQnSg6Vv5X0RboYDO/exec";
+  "https://script.google.com/macros/s/AKfycbzr_HBCvbj-j_0hiIvRrcXIu-xQeiMMZREEAh1fyHsgB7I-5NTNjzPiYWiyd0CLgCaMNA/exec";
 
 // Sheet names and category values must match the Google Sheet exactly,
 // so they stay in Indonesian. Only the code identifiers are in English.
@@ -261,25 +261,39 @@ export async function loadSpreadsheet(
 
   await Promise.all([
     ...MONTH_NAMES.map((monthName) =>
-      loadSheet(monthName, async (rows, headerRows) => {
-        // The salary value sits in the cell right below the "Gaji" label.
+      loadSheet(monthName, (rows, headerRows) => {
+        // 1. Cek di headerRows (kolom B) tepat di bawah label "gaji"
         const labelIndex = headerRows.findIndex((cells) =>
-          /gaji/i.test(cells[0]),
+          /gaji|income|pemasukan/i.test(cells[0] || ""),
         );
         let salary = 0;
-        if (labelIndex >= 0) {
-          try {
-            const valueRow = labelIndex + 2; // 1-based row number below the label
-            const cellRows = await fetchRows(
-              spreadsheetId,
-              monthName,
-              `B${valueRow}:B${valueRow}`,
+        if (labelIndex >= 0 && headerRows[labelIndex + 1]) {
+          salary = parseRupiah(headerRows[labelIndex + 1][0]);
+        }
+
+        // 2. Jika belum ditemukan, scan baris 1-8 pada seluruh kolom
+        if (!salary && rows.length > 0) {
+          for (let r = 0; r < Math.min(rows.length, 8); r++) {
+            const row = rows[r];
+            const colIdx = row.findIndex((cell) =>
+              /gaji|income|pemasukan/i.test(cell || ""),
             );
-            salary = parseRupiah((cellRows[0] || [])[0]);
-          } catch (error) {
-            /* keep salary = 0 */
+            if (colIdx >= 0 && rows[r + 1]) {
+              salary =
+                parseRupiah(rows[r + 1][colIdx]) ||
+                parseRupiah(rows[r + 1][1]);
+              if (salary) break;
+            }
           }
         }
+
+        // 3. Fallback standar: nilai sel B3 (baris 3 kolom B)
+        if (!salary) {
+          salary =
+            parseRupiah((headerRows[2] || [])[0]) ||
+            parseRupiah((rows[2] || [])[1]);
+        }
+
         months[monthName] = { salary, transactions: extractTransactions(rows) };
       }),
     ),

@@ -15,6 +15,7 @@ import {
   loadSpreadsheet,
   loadBudgets,
   buildBudgetPayload,
+  buildSalaryPayload,
   sendToAppsScript,
   buildNewSheetPayload,
   buildDeletePayload,
@@ -40,6 +41,7 @@ interface FinanceContextValue {
   setAppsScriptUrl: (url: string) => void;
   budgets: Record<string, number>; // category -> monthly limit
   setBudgets: (budgets: Record<string, number>) => void;
+  salaries: Record<string, number>; // month -> monthly salary cache
   savingsGoal: number;
   setSavingsGoal: (goal: number) => void;
   // data from Google Sheets
@@ -56,6 +58,8 @@ interface FinanceContextValue {
   summarizeMonth: (month: string) => MonthSummary;
   /** Persists budgets to the "Anggaran" sheet via Apps Script, then re-syncs. */
   saveBudgets: (budgets: Record<string, number>) => Promise<void>;
+  /** Updates salary optimistically and syncs to Google Sheet via Apps Script. */
+  updateSalary: (month: string, newSalary: number) => Promise<void>;
   // actions
   syncData: () => Promise<LoadResult | null>;
   sendChange: (payload: AppsScriptPayload) => Promise<void>;
@@ -71,6 +75,8 @@ interface FinanceContextValue {
   setEditor: (editor: EditorState | null) => void;
   isNewMonthDialogOpen: boolean;
   setNewMonthDialogOpen: (isOpen: boolean) => void;
+  isSalaryModalOpen: boolean;
+  setIsSalaryModalOpen: (isOpen: boolean) => void;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -92,6 +98,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     "bg",
     {},
   ); // { category: monthly limit }
+  const [salariesCache, setSalariesCache] = useLocalStorage<
+    Record<string, number>
+  >("salaries_cache", {});
   const [savingsGoal, setSavingsGoal] = useLocalStorage("goal", 0);
 
   // Data loaded from Google Sheets
@@ -105,6 +114,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [selectedMonth, setSelectedMonth] = useState("Oktober");
   const [editor, setEditor] = useState<EditorState | null>(null); // while the dialog is open
   const [isNewMonthDialogOpen, setNewMonthDialogOpen] = useState(false);
+  const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
 
   const { months, savings, debts } = data;
   const loadedMonths = MONTH_NAMES.filter((month) => months[month]);
@@ -129,6 +139,21 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       );
       return null;
     }
+
+    // Merge: sheet values update cache; cached values protect against empty reads
+    setSalariesCache((prev: Record<string, number>) => {
+      const merged = { ...prev };
+      available.forEach((month) => {
+        const sheetSalary = result.months[month]?.salary || 0;
+        if (sheetSalary > 0) {
+          merged[month] = sheetSalary;
+        } else if (merged[month]) {
+          result.months[month].salary = merged[month];
+        }
+      });
+      return merged;
+    });
+
     setData(result);
     // Merge: sheet values win over localStorage cache
     if (Object.keys(sheetBudgets).length > 0) {
@@ -177,6 +202,51 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       setStatusMessage("Anggaran tersimpan ke Sheet ✓");
     } catch (error) {
       setStatusMessage("Gagal simpan anggaran ke Sheet: " + error);
+    }
+  };
+
+  /** Updates salary optimistically and syncs to Google Sheet via Apps Script. */
+  const updateSalary = async (month: string, newSalary: number) => {
+    // 1. Optimistic update in state
+    setData((prev) => {
+      const existing = prev.months[month];
+      if (!existing) return prev;
+      return {
+        ...prev,
+        months: {
+          ...prev.months,
+          [month]: {
+            ...existing,
+            salary: newSalary,
+          },
+        },
+      };
+    });
+
+    // 2. Cache in localStorage immediately
+    setSalariesCache((prev: Record<string, number>) => ({
+      ...prev,
+      [month]: newSalary,
+    }));
+
+    if (!appsScriptUrl) {
+      setStatusMessage(
+        "Gaji diperbarui di perangkat (URL Apps Script belum diatur).",
+      );
+      return;
+    }
+
+    // 3. Send to Google Apps Script
+    setStatusMessage(`Menyimpan gaji ${month} ke Google Sheet...`);
+    try {
+      await sendToAppsScript(
+        appsScriptUrl,
+        buildSalaryPayload(month, newSalary),
+      );
+      setStatusMessage(`Gaji ${month} berhasil disinkronkan ke Google Sheet ✓`);
+      setTimeout(syncData, 3000);
+    } catch (error) {
+      setStatusMessage("Gagal menyinkronkan gaji: " + error);
     }
   };
 
@@ -275,7 +345,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setAppsScriptUrl,
     budgets,
     setBudgets,
+    salaries: salariesCache,
     saveBudgets,
+    updateSalary,
     savingsGoal,
     setSavingsGoal,
     months,
@@ -298,6 +370,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setEditor,
     isNewMonthDialogOpen,
     setNewMonthDialogOpen,
+    isSalaryModalOpen,
+    setIsSalaryModalOpen,
   };
   return (
     <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>

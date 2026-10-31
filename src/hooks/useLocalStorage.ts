@@ -4,7 +4,7 @@ import { useState } from "react";
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-): [T, (newValue: T) => void] {
+): [T, (newValue: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(() => {
     try {
       return JSON.parse(localStorage.getItem(key) ?? "null") ?? initialValue;
@@ -12,13 +12,19 @@ export function useLocalStorage<T>(
       return initialValue;
     }
   });
-  const setAndStore = (newValue: T) => {
-    setValue(newValue);
-    try {
-      localStorage.setItem(key, JSON.stringify(newValue));
-    } catch {
-      /* storage unavailable */
-    }
+  const setAndStore = (newValue: T | ((prev: T) => T)) => {
+    setValue((current) => {
+      const next =
+        typeof newValue === "function"
+          ? (newValue as (prev: T) => T)(current)
+          : newValue;
+      try {
+        localStorage.setItem(key, JSON.stringify(next));
+      } catch {
+        /* storage unavailable */
+      }
+      return next;
+    });
   };
   return [value, setAndStore];
 }

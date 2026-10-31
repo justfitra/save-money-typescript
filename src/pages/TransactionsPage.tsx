@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CATEGORY_ICONS, buildSalaryPayload, formatRupiah } from "../api";
+import { CATEGORY_ICONS, formatRupiah } from "../api";
 import { Icon, KpiGrid, MonthPills, TransactionList } from "../components";
 import { useFinance } from "../context/FinanceContext";
 import type { MonthSummary } from "../types";
@@ -10,10 +10,10 @@ export function TransactionsPage({ summary }: { summary: MonthSummary }) {
     loadedMonths,
     selectedMonth,
     setSelectedMonth,
-    sendChange,
     handleEdit,
     handleDelete,
     setNewMonthDialogOpen,
+    setIsSalaryModalOpen,
   } = useFinance();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -27,12 +27,7 @@ export function TransactionsPage({ summary }: { summary: MonthSummary }) {
           .includes(query)),
   );
   const changeSalary = () => {
-    const input = prompt(
-      `Gaji / pemasukan utama ${selectedMonth} (angka):`,
-      String(months[selectedMonth].salary),
-    );
-    if (input !== null && +input >= 0)
-      sendChange(buildSalaryPayload(selectedMonth, +input));
+    setIsSalaryModalOpen(true);
   };
 
   return (

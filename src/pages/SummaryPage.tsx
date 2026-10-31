@@ -13,6 +13,7 @@ export function SummaryPage({ summary }: { summary: MonthSummary }) {
     selectedMonth,
     setSelectedMonth,
     summarizeMonth,
+    setIsSalaryModalOpen,
   } = useFinance();
   const monthlySummaries = loadedMonths.map((month) => ({
     month,
@@ -53,6 +54,29 @@ export function SummaryPage({ summary }: { summary: MonthSummary }) {
               {Math.abs(changePercent)}% dari bulan lalu
             </>
           )}
+        </div>
+        <div
+          style={{
+            marginTop: 10,
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <button
+            className="btn-ghost"
+            style={{
+              background: "rgba(255, 255, 255, 0.22)",
+              color: "#fff",
+              border: "1px solid rgba(255, 255, 255, 0.4)",
+              borderRadius: "99px",
+              padding: "5px 14px",
+              fontSize: 12,
+              backdropFilter: "blur(4px)",
+            }}
+            onClick={() => setIsSalaryModalOpen(true)}
+          >
+            <Icon name="fa-briefcase" /> Ubah Gaji ({formatRupiah(summary.salary)})
+          </button>
         </div>
       </div>
       <MonthPills

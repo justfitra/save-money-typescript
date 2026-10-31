@@ -2,8 +2,9 @@ import { MONTH_NAMES, buildSavePayload } from "../../api";
 import { useFinance } from "../../context/FinanceContext";
 import { EntryModal } from "./EntryModal";
 import { NewMonthModal } from "./NewMonthModal";
+import { SalaryModal } from "./SalaryModal";
 
-/** Renders whichever dialog is currently open (add/edit entry, new month sheet). */
+/** Renders whichever dialog is currently open (add/edit entry, new month sheet, salary). */
 export function ModalHost() {
   const {
     editor,
@@ -11,6 +12,9 @@ export function ModalHost() {
     sendChange,
     isNewMonthDialogOpen,
     setNewMonthDialogOpen,
+    isSalaryModalOpen,
+    setIsSalaryModalOpen,
+    updateSalary,
     months,
     selectedMonth,
     createMonthSheet,
@@ -18,6 +22,14 @@ export function ModalHost() {
 
   return (
     <>
+      {isSalaryModalOpen && (
+        <SalaryModal
+          month={selectedMonth}
+          currentSalary={months[selectedMonth]?.salary || 0}
+          onSave={updateSalary}
+          onClose={() => setIsSalaryModalOpen(false)}
+        />
+      )}
       {isNewMonthDialogOpen && (
         <NewMonthModal
           availableMonths={MONTH_NAMES.filter((month) => !months[month])}
