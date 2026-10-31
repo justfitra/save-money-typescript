@@ -12,7 +12,7 @@ import type {
 export const DEFAULT_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1j4zjt8jFbzS9cfcKQiqj3hXB-vlzhQ0GEM7RIKXzNMo/edit";
 export const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwtLULKN64hma56qpSPggAOCWRTqbp9aIkU6WJgDQ0chIH9cCKZTkKbGaaXmvWoREr2kg/exec";
+  "https://script.google.com/macros/s/AKfycbxqSDwZEkb9CACzSLBjxOOZlFPos1cv6FGMY9TdKEqcu0FrpF7RQnSg6Vv5X0RboYDO/exec";
 
 // Sheet names and category values must match the Google Sheet exactly,
 // so they stay in Indonesian. Only the code identifiers are in English.
@@ -252,9 +252,9 @@ export async function loadSpreadsheet(
     } catch (error) {
       missing.push(
         sheetName +
-          " (" +
-          (error instanceof Error ? error.message : String(error)) +
-          ")",
+        " (" +
+        (error instanceof Error ? error.message : String(error)) +
+        ")",
       );
     }
   };
